@@ -1,7 +1,3 @@
-
-// кнопка не активна поки не будуть введені коректні дані
-// <span _ngcontent-ruu-c48="" aria-hidden="true">×</span> працює
-
 import test, { expect } from "@playwright/test";
 
 test.beforeEach((async ({ page }) => {
