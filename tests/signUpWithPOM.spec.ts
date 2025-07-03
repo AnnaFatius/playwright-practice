@@ -18,76 +18,65 @@ test.describe('Sign up tests', () => {
     await homePage.clickSignUpButton();
     }));
 
-    test('Displaying all items in the "Registration" pop-up window', async () => {
+    test('Registration modal displays all required fields and buttons', async () => {
         await signUpForm.expectFormElementsToBeVisible();
     });
 
-    test('Close button in the "Registration" pop-up window', async () => {
-        await signUpForm.closeSignUpModal();
+    test('Registration modal closes on close button click', async () => {
+        await signUpForm.confirmSignUpModalClosed();
     });
 
     test('Valid user data in the registration form', async () => {
         const randomEmail = `aqa_${Date.now()}@testmail.com`;
 
-        await signUpForm.enterName('Alisa');
-        await signUpForm.enterLastName('Govard');
-        await signUpForm.enterRandomEmail(randomEmail);
-        await signUpForm.enterPassword('QWErtuiop86#');
-        await signUpForm.enterReEnterPassword('QWErtuiop86#');
+        await signUpForm.enterDataInField(signUpForm.nameField, 'Alisa');
+        await signUpForm.enterDataInField(signUpForm.lastNameField, 'Govard');
+        await signUpForm.enterDataInField(signUpForm.emailField, randomEmail);
+        await signUpForm.enterDataInField(signUpForm.passwordField, 'QWErtuiop86#');
+        await signUpForm.enterDataInField(signUpForm.reEnterPasswordField, 'QWErtuiop86#');
         await signUpForm.clickRegisterButton();
     });
 
     test('Messages about an empty field and border color', async () => {
-        await signUpForm.emptyNameFieldError();
-        await basePage.verifyErrorIsDisplayed('Name required');
-
-        await signUpForm.emptyLastNameFieldError();
-        await basePage.verifyErrorIsDisplayed('Last name required');
-
-        await signUpForm.emptyEmailFieldError();
-        await basePage.verifyErrorIsDisplayed('Email required');
-
-        await signUpForm.emptyPasswordFieldError();
-        await basePage.verifyErrorIsDisplayed('Password required');
-
-        await signUpForm.emptyReEnterPasswordFieldError();
-        await basePage.verifyErrorIsDisplayed('Re-enter password required');
-
+        await signUpForm.verifyEmptyFieldError(signUpForm.nameField, signUpForm.nameFieldError);
+        await signUpForm.verifyEmptyFieldError(signUpForm.lastNameField, signUpForm.lastNameFieldError);
+        await signUpForm.verifyEmptyFieldError(signUpForm.emailField, signUpForm.emailFieldError);
+        await signUpForm.verifyEmptyFieldError(signUpForm.passwordField, signUpForm.passwordFieldError);
+        await signUpForm.verifyEmptyFieldError(signUpForm.reEnterPasswordField, signUpForm.reEnterPasswordFieldError);
         await signUpForm.expectAllBordersToBeRed();
+        await signUpForm.disabledRegisterButton();
     });
 
-    test('Invalid user data in the registration form', async () => {
-        
-    //name
-    await signUpForm.enterName('&d');
-    await signUpForm.invalidDataInNameField([
-    'Name has to be from 2 to 20 characters long',
-    'Name is invalid'
-    ]);
+    test('Invalid user Name data in the registration form', async () => {  
+        await signUpForm.enterDataInField(signUpForm.nameField, '&d');
+        await signUpForm.verifyValidationErrorForField(signUpForm.nameFieldError, [
+        'Name has to be from 2 to 20 characters long',
+        'Name is invalid']);
+        await signUpForm.disabledRegisterButton();
+    });
 
-    //last name
-    await signUpForm.enterLastName('rdfrwkjvysjfrfdhjyvbgrd');
-    await signUpForm.invalidDataInLastNameField([
-    'Last name has to be from 2 to 20 characters long',
-    'Last name is invalid'
-    ]); 
+    test('Invalid user Last Name data in the registration form', async () => {
+        await signUpForm.enterDataInField(signUpForm.lastNameField, 'rdfrwkjvysjfrfdhjyvbgrd');
+        await signUpForm.verifyValidationErrorForField(signUpForm.lastNameFieldError,[
+        'Last name has to be from 2 to 20 characters long',
+        'Last name is invalid']); 
+        await signUpForm.disabledRegisterButton();
+    });
 
-    //email
-    await signUpForm.enterEmail('mhgck67t');
-    await signUpForm.invalidDataInEmailField('Email is incorrect');
+    test('Invalid user Email data in the registration form', async () => { 
+        await signUpForm.enterDataInField(signUpForm.emailField, 'mhgck67t');
+        await signUpForm.verifyValidationErrorForField(signUpForm.emailFieldError, 'Email is incorrect');
+        await signUpForm.disabledRegisterButton();
+    });
 
-    //password
-    await signUpForm.enterPassword('ojnaGbf');
-    await signUpForm.invalidDataInPasswordField('Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter'); 
-    
-    //password2
-    await signUpForm.enterReEnterPassword('penkcoe');
-    await signUpForm.invalidDataInReEnterPasswordField([
-    'Passwords do not match',
-    'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter'
-    ]);
-    
-    //register Button
-    await signUpForm.disabledRegisterButton();
+    test('Invalid user Password and Re-enter Password data in the registration form', async () => {
+        await signUpForm.enterDataInField(signUpForm.passwordField, 'mhkG7t');
+        await signUpForm.verifyValidationErrorForField(signUpForm.passwordFieldError, 'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
+
+        await signUpForm.enterDataInField(signUpForm.reEnterPasswordField, 'penkcoe');
+        await signUpForm.verifyValidationErrorForField(signUpForm.reEnterPasswordFieldError,[
+        'Passwords do not match',
+        'Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter']); 
+        await signUpForm.disabledRegisterButton();
     });
 })

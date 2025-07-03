@@ -4,20 +4,20 @@ import BasePage from '../BasePage';
 
 export default class SignUpForm extends BasePage {
 
-  private readonly signUpModal: Locator = this.page.locator('app-signup-modal');
-  private readonly nameField: Locator = this.page.locator('#signupName');
-  private readonly lastNameField: Locator = this.page.locator('#signupLastName');
-  private readonly emailField: Locator = this.page.getByRole('textbox', { name: 'Email' });
-  private readonly passwordField: Locator = this.page.locator('#signupPassword');
-  private readonly reEnterPasswordField: Locator = this.page.locator('#signupRepeatPassword');        
-  private readonly registerButton: Locator = this.page.getByText('Register');
-  private readonly closeButton: Locator = this.page.locator('//button[@class="close"]');
+  public readonly signUpModal: Locator = this.page.locator('app-signup-modal');
+  public readonly nameField: Locator = this.page.locator('#signupName');
+  public readonly lastNameField: Locator = this.page.locator('#signupLastName');
+  public readonly emailField: Locator = this.page.getByRole('textbox', { name: 'Email' });
+  public readonly passwordField: Locator = this.page.locator('#signupPassword');
+  public readonly reEnterPasswordField: Locator = this.page.locator('#signupRepeatPassword');        
+  public readonly registerButton: Locator = this.page.getByText('Register');
+  public readonly closeButton: Locator = this.page.locator('//button[@class="close"]');
 
-  private readonly nameFieldError: Locator = this.page.locator('//input[@id="signupName"]//..//*[@class="invalid-feedback"]//p');
-  private readonly lastNameFieldError: Locator = this.page.locator('//input[@id="signupLastName"]//..//*[@class="invalid-feedback"]//p');
-  private readonly emailFieldError: Locator = this.page.locator('//input[@id="signupEmail"]//..//*[@class="invalid-feedback"]//p');
-  private readonly passwordFieldError: Locator = this.page.locator('//input[@id="signupPassword"]//..//*[@class="invalid-feedback"]//p');
-  private readonly reEnterPasswordFieldError: Locator = this.page.locator('//input[@id="signupRepeatPassword"]//..//*[@class="invalid-feedback"]//p');
+  public readonly nameFieldError: Locator = this.page.locator('//input[@id="signupName"]//..//*[@class="invalid-feedback"]//p');
+  public readonly lastNameFieldError: Locator = this.page.locator('//input[@id="signupLastName"]//..//*[@class="invalid-feedback"]//p');
+  public readonly emailFieldError: Locator = this.page.locator('//input[@id="signupEmail"]//..//*[@class="invalid-feedback"]//p');
+  public readonly passwordFieldError: Locator = this.page.locator('//input[@id="signupPassword"]//..//*[@class="invalid-feedback"]//p');
+  public readonly reEnterPasswordFieldError: Locator = this.page.locator('//input[@id="signupRepeatPassword"]//..//*[@class="invalid-feedback"]//p');
 
   async expectFormElementsToBeVisible() {
     await expect(this.nameField).toBeVisible();
@@ -29,39 +29,10 @@ export default class SignUpForm extends BasePage {
     await expect(this.registerButton).toBeVisible();
     await expect(this.registerButton).toBeDisabled();
   }
-  async closeSignUpModal(){
+
+  async confirmSignUpModalClosed(){
     await this.closeButton.click();
     await expect(this.signUpModal).toBeVisible({visible: false});
-  }
-
-  async enterName(value: string){
-    await this.nameField.fill(value);
-    await this.nameField.evaluate(el => el.blur());
-  }
-
-  async enterLastName(value: string){
-    await this.lastNameField.fill(value);
-    await this.lastNameField.evaluate(el => el.blur());
-  }
-
-  async enterRandomEmail(email: string){
-    await this.emailField.fill(email);
-    await this.emailField.evaluate(el => el.blur());
-  }
-
-  async enterEmail(value: string){
-    await this.emailField.fill(value);
-    await this.emailField.evaluate(el => el.blur());
-  }
-
-  async enterPassword(value: string){
-    await this.passwordField.fill(value);
-    await this.passwordField.evaluate(el => el.blur());
-  }
-
-  async enterReEnterPassword(value: string){
-    await this.reEnterPasswordField.fill(value);
-    await this.reEnterPasswordField.evaluate(el => el.blur());
   }
 
   async clickRegisterButton(){
@@ -72,34 +43,20 @@ export default class SignUpForm extends BasePage {
     await expect(this.registerButton).toBeDisabled();
   }
 
-  async emptyNameFieldError(){
-    await this.nameField.focus();
-    await this.nameField.blur();
-    await this.nameFieldError.isVisible();
+  async enterDataInField(field: Locator, value: string){
+    await field.fill(value);
+    await field.evaluate(el => el.blur());
   }
 
-  async emptyLastNameFieldError(){
-    await this.lastNameField.focus();
-    await this.lastNameField.blur();
-    await this.lastNameFieldError.isVisible();
+  async verifyEmptyFieldError(field: Locator, fieldError: Locator){
+    await field.focus();
+    await field.evaluate(el => el.blur());
+    await fieldError.isVisible();
   }
 
-  async emptyEmailFieldError(){
-    await this.emailField.focus();
-    await this.emailField.blur();
-    await this.emailFieldError.isVisible();
-  }
-
-  async emptyPasswordFieldError(){
-    await this.passwordField.focus();
-    await this.passwordField.blur();
-    await this.passwordFieldError.isVisible();
-  }
-
-  async emptyReEnterPasswordFieldError(){
-    await this.reEnterPasswordField.focus();
-    await this.reEnterPasswordField.blur();
-    await this.reEnterPasswordFieldError.isVisible();
+  async verifyValidationErrorForField(errorLocator: Locator, expectedMessages: string | string[]){
+    const actualError = await errorLocator.textContent();
+    expect(expectedMessages).toContain(actualError);
   }
 
   async expectAllBordersToBeRed() {
@@ -110,29 +67,4 @@ export default class SignUpForm extends BasePage {
     await expect(this.passwordField).toHaveCSS('border-color', redBorder);
     await expect(this.reEnterPasswordField).toHaveCSS('border-color', redBorder);
   }
-
-  async invalidDataInNameField(messages: string[]) {
-    const actualError = await this.nameFieldError.textContent();
-    expect(messages).toContain(actualError);
-  }
-
-  async invalidDataInLastNameField(messages: string[]) {
-    const actualError = await this.lastNameFieldError.textContent();
-    expect(messages).toContain(actualError);
-  }
-
-  async invalidDataInEmailField(messages: string) {
-    const actualError = await this.emailFieldError.textContent();
-    expect(messages).toContain(actualError);
-  }
-
-  async invalidDataInPasswordField(messages: string) {
-    const actualError = await this.passwordFieldError.textContent();
-    expect(messages).toContain(actualError);
-  }
-
-  async invalidDataInReEnterPasswordField(messages: string[]) {
-    const actualError = await this.reEnterPasswordFieldError.textContent();
-    expect(messages).toContain(actualError);
-  } 
 }
