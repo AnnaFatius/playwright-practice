@@ -38,13 +38,24 @@ export default defineConfig({
       'username': process.env.HTTP_CREDENTIALS_USERNAME!,
       'password': process.env.HTTP_CREDENTIALS_PASSWORD!
     },
+    headless: false,
   },
 
   /* Configure projects for major browsers */
   projects: [
+
+    {
+      name: 'setup',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: '*/setup/**.ts',
+    
+    },
+
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: '*/setup/**.ts',
+      dependencies: ['setup'],
     },
 
     // {
